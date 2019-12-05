@@ -16,21 +16,21 @@ try
 {
     $currentDirectory = Split-Path -Path $MyInvocation.MyCommand.Definition
 
-    if (Test-Path "$currentDirectory\DeleteLog_config.ps1")
+    if (Test-Path "$currentDirectory\DeleteFile_config.ps1")
     {
         # Get Informations about log folders from configuration file
-        $logFoldersInfo = Get-Content $currentDirectory\DeleteLog_config.ps1
+        $FileFoldersInfo = Get-Content $currentDirectory\DeleteFile_config.ps1
         
         # Exclude first line
         $i=1
-        while ($i -lt $logFoldersInfo.Length)
+        while ($i -lt $FileFoldersInfo.Length)
         {
             try
             {
-                $daysToKeep = $logFoldersInfo[$i].split('|')[0]
-                [string[]]$included_extensions = $logFoldersInfo[$i].split('|')[1].split(',')
-                [string[]]$excluded_extensions = $logFoldersInfo[$i].split('|')[2].split(',')
-                $logFolder = $logFoldersInfo[$i].split('|')[3]
+                $daysToKeep = $FileFoldersInfo[$i].split('|')[0]
+                [string[]]$included_extensions = $FileFoldersInfo[$i].split('|')[1].split(',')
+                [string[]]$excluded_extensions = $FileFoldersInfo[$i].split('|')[2].split(',')
+                $FileFolder = $FileFoldersInfo[$i].split('|')[3]
                 
                 $included_extensionPattern = ""
                 $excluded_extensionPattern = ""
@@ -57,20 +57,20 @@ try
                     $excluded_extensionPattern = $excluded_extensionPattern.remove($excluded_extensionPattern.Length - 1)
                 }
             
-                if (Test-Path $logFolder)
+                if (Test-Path $FileFolder)
                 {
                     # Recursive - Folder
                     if ($recurse)
                     {
-                        Get-ChildItem $logFolder -Exclude $excluded_extensionPattern -Recurse  | ? {$_.mode -like "-a---*" -and ($_.LastWriteTime -lt (Get-Date).adddays(-$daysToKeep)) -and $_.Extension -match $included_extensionPattern } | Remove-Item -Force
+                        Get-ChildItem $FileFolder -Exclude $excluded_extensionPattern -Recurse  | ? {$_.mode -like "-a---*" -and ($_.LastWriteTime -lt (Get-Date).adddays(-$daysToKeep)) -and $_.Extension -match $included_extensionPattern } | Remove-Item -Force
                     }
                     # Not recursive
-                    Get-ChildItem $logFolder -Exclude $excluded_extensionPattern | ? {$_.mode -like "-a---*" -and ($_.LastWriteTime -lt (Get-Date).adddays(-$daysToKeep)) -and $_.Extension -match $included_extensionPattern} | Remove-Item -Force
+                    Get-ChildItem $FileFolder -Exclude $excluded_extensionPattern | ? {$_.mode -like "-a---*" -and ($_.LastWriteTime -lt (Get-Date).adddays(-$daysToKeep)) -and $_.Extension -match $included_extensionPattern} | Remove-Item -Force
                 }
             }
             catch [System.exception]
             {
-                writeEventLog "DeleteLog" $_.Exception.Message ([System.Diagnostics.EventLogEntryType]::Error)
+                writeEventLog "DeleteFile" $_.Exception.Message ([System.Diagnostics.EventLogEntryType]::Error)
             }
             $i++
         }
@@ -79,5 +79,5 @@ try
 }
 catch [System.exception]
 {
-    writeEventLog "DeleteLog" $_.Exception.Message ([System.Diagnostics.EventLogEntryType]::Error)
+    writeEventLog "DeleteFile" $_.Exception.Message ([System.Diagnostics.EventLogEntryType]::Error)
 }
