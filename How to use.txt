@@ -1,0 +1,7 @@
+.\DeleteLog.ps1 -recurse
+	=> Va suprimmer les répertoires de facon récursive
+
+Il suffit d'enlever le parametre pour que ce ne soit plus récursif.
+.\DeleteLog.ps1
+
+Dans tous les cas le script va suivre le fichier de conf.
